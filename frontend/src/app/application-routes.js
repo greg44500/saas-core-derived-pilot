@@ -1,4 +1,7 @@
 import {
+  catalogFrontendRouteModule,
+} from '@/features/catalog/catalog-routes';
+import {
   CORE_HELP_FRONTEND_ROUTE_MODULE,
 } from '@/features/help/help-routes';
 
@@ -66,7 +69,9 @@ function composeApplicationFrontendRoutes(modules = []) {
  * modules métier. Les SaaS dérivés ajoutent ensuite leurs routes sans modifier
  * le routeur principal ni découvrir des fichiers automatiquement.
  */
-const APPLICATION_FRONTEND_ROUTE_MODULES = Object.freeze([]);
+const APPLICATION_FRONTEND_ROUTE_MODULES = Object.freeze([
+  catalogFrontendRouteModule,
+]);
 
 const APPLICATION_FRONTEND_ROUTES = composeApplicationFrontendRoutes([
   CORE_HELP_FRONTEND_ROUTE_MODULE,

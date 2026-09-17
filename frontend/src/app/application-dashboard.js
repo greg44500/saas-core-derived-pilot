@@ -1,3 +1,4 @@
+import { catalogDashboardModule } from '@/features/catalog/catalog-dashboard';
 import { coreDashboardWidgets } from '@/features/workspace/dashboard/core-dashboard-widgets';
 
 const DASHBOARD_WIDGET_ID_PATTERN = /^[a-z0-9]+(?:[._-][a-z0-9]+)*$/;
@@ -123,7 +124,9 @@ function getVisibleDashboardWidgets(accessibleWidgets, hiddenWidgetIds = []) {
   );
 }
 
-const APPLICATION_DASHBOARD_WIDGET_MODULES = Object.freeze([]);
+const APPLICATION_DASHBOARD_WIDGET_MODULES = Object.freeze([
+  catalogDashboardModule,
+]);
 
 const applicationDashboardWidgets = composeApplicationDashboardWidgets(
   APPLICATION_DASHBOARD_WIDGET_MODULES,
