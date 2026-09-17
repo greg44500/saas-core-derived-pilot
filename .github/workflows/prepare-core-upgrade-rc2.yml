@@ -1,0 +1,123 @@
+name: Prepare Core Upgrade RC2
+
+on:
+  push:
+    branches:
+      - ops/prepare-core-update-1.0.0-rc.2
+    paths:
+      - .github/workflows/prepare-core-upgrade-rc2.yml
+
+permissions:
+  contents: write
+
+jobs:
+  prepare-upgrade:
+    runs-on: ubuntu-latest
+    env:
+      PILOT_MAIN_SHA: cd13ab0f6a1a1b28a1b8e84102ae990ad0543ce1
+      CORE_REPOSITORY: https://github.com/greg44500/saas-core-api.git
+      CORE_TAG: v1.0.0-rc.2
+      CORE_SHA: 5c61c7066eeb56460adb164ba39ae0a0462bef53
+      PREVIOUS_CORE_VERSION: 1.0.0-rc.1
+      PREVIOUS_CORE_SHA: 432fcfd88cd185234e6317a27df0d3d458f93f28
+      UPGRADE_BRANCH: core-update/1.0.0-rc.2
+
+    steps:
+      - name: Checkout operations branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify pilot baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          ACTUAL_MAIN="$(git rev-parse origin/main)"
+          if [ "$ACTUAL_MAIN" != "$PILOT_MAIN_SHA" ]; then
+            echo "Expected pilot main $PILOT_MAIN_SHA but found $ACTUAL_MAIN"
+            exit 1
+          fi
+
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const origin = JSON.parse(fs.readFileSync('core-origin.json', 'utf8'));
+          if (origin.version !== process.env.PREVIOUS_CORE_VERSION) {
+            throw new Error(`Unexpected pilot Core version: ${origin.version}`);
+          }
+          if (origin.commit !== process.env.PREVIOUS_CORE_SHA) {
+            throw new Error(`Unexpected pilot Core commit: ${origin.commit}`);
+          }
+          NODE
+
+      - name: Fetch upstream Core and verify RC2
+        shell: bash
+        run: |
+          set -euo pipefail
+          git remote add upstream-core "$CORE_REPOSITORY"
+          git fetch upstream-core --tags
+          TAG_SHA="$(git rev-list -n 1 "$CORE_TAG")"
+          if [ "$TAG_SHA" != "$CORE_SHA" ]; then
+            echo "Expected $CORE_TAG to resolve to $CORE_SHA but found $TAG_SHA"
+            exit 1
+          fi
+
+      - name: Create dedicated upgrade branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git ls-remote --exit-code --heads origin "refs/heads/$UPGRADE_BRANCH" >/dev/null 2>&1; then
+            echo "Upgrade branch $UPGRADE_BRANCH already exists; refusing to overwrite it."
+            exit 1
+          fi
+          git switch -c "$UPGRADE_BRANCH" origin/main
+
+      - name: Merge Core RC2 and report real conflicts
+        shell: bash
+        run: |
+          set -uo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git merge --no-ff --no-edit "$CORE_TAG"; then
+            echo "MERGE_CONFLICT_COUNT=0"
+          else
+            echo "Core upgrade produced conflicts:"
+            git diff --name-only --diff-filter=U | tee /tmp/core-upgrade-conflicts.txt
+            CONFLICT_COUNT="$(wc -l < /tmp/core-upgrade-conflicts.txt | tr -d ' ')"
+            echo "MERGE_CONFLICT_COUNT=$CONFLICT_COUNT"
+            exit 1
+          fi
+
+      - name: Verify business module remains present
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f backend/modules/catalog/catalog.routes.js
+          test -f backend/modules/catalog/catalog.service.js
+          test -f backend/modules/catalog/catalog.validation.js
+          test -f frontend/src/features/catalog/catalog-routes.js
+          test -f frontend/src/features/catalog/pages/catalog-page.jsx
+
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const origin = JSON.parse(fs.readFileSync('core-origin.json', 'utf8'));
+          if (origin.version !== process.env.PREVIOUS_CORE_VERSION || origin.commit !== process.env.PREVIOUS_CORE_SHA) {
+            throw new Error('core-origin.json changed before upgrade validation');
+          }
+          NODE
+
+      - name: Show merged scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Files changed versus pilot main:"
+          git diff --name-status origin/main...HEAD
+          echo "Merge parents:"
+          git show -s --format='%H%n%P%n%s' HEAD
+
+      - name: Push upgrade branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git push origin "$UPGRADE_BRANCH"
