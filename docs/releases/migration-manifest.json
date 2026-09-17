@@ -96,6 +96,12 @@
       "script": "migration:baseline-remove-file-upload",
       "runner": "backend/migrations/runRemoveFileUploadFromBaselinePlanMigration.js",
       "dependsOn": ["baseline-plan-system-role"]
+    },
+    {
+      "id": "catalog-system-role-permissions",
+      "script": "migration:catalog-system-role-permissions",
+      "runner": "backend/migrations/runBackfillCatalogSystemRolePermissionsMigration.js",
+      "dependsOn": []
     }
   ]
 }

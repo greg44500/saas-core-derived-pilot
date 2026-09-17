@@ -1,3 +1,4 @@
+import { catalogWorkspaceNavigation } from '@/features/catalog/catalog-navigation';
 import { coreWorkspaceNavigation } from '@/features/workspace/navigation/core-workspace-navigation';
 
 /**
@@ -42,14 +43,10 @@ function composeWorkspaceNavigation(navigationModules = []) {
 
 /**
  * Point de composition de la navigation Workspace du produit dérivé.
- *
- * Exemple :
- *
- * const APPLICATION_WORKSPACE_NAVIGATION_MODULES = Object.freeze([
- *   catalogWorkspaceNavigation,
- * ]);
  */
-const APPLICATION_WORKSPACE_NAVIGATION_MODULES = Object.freeze([]);
+const APPLICATION_WORKSPACE_NAVIGATION_MODULES = Object.freeze([
+  catalogWorkspaceNavigation,
+]);
 
 const workspaceNavigation = composeWorkspaceNavigation(
   APPLICATION_WORKSPACE_NAVIGATION_MODULES,

@@ -1,4 +1,7 @@
 import {
+    catalogHelpModule,
+} from '../modules/catalog/catalogHelp.js';
+import {
     composeHelpModuleExtensions,
     createHelpRegistry,
 } from '../modules/help/help.registry.js';
@@ -22,7 +25,9 @@ import {
  * restent exécutables en mode remédiation. Sans déclaration, la fiche reste
  * limitée au mode normal par sécurité.
  */
-const APPLICATION_HELP_MODULES = Object.freeze([]);
+const APPLICATION_HELP_MODULES = Object.freeze([
+    catalogHelpModule,
+]);
 
 const helpExtensions = composeHelpModuleExtensions(
     APPLICATION_HELP_MODULES,
