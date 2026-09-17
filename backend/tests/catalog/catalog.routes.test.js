@@ -94,10 +94,8 @@ vi.mock('../../modules/catalog/catalog.controller.js', () => ({
 
 beforeEach(() => {
     authenticate.mockClear();
-    validateRequest.mockClear();
-    authorizePermission.mockClear();
-    enforcePlanFeature.mockClear();
-    enforceWorkspaceAccessMode.mockClear();
+    // Ces factories sont invoquées à l'import du module de routes.
+    // Effacer leurs appels supprimerait le contrat de composition à tester.
     validationMiddleware.mockClear();
     workspaceContextMiddleware.mockClear();
     permissionMiddleware.mockClear();
