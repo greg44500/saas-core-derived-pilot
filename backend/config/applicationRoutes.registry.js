@@ -1,3 +1,6 @@
+import { catalogRouter } from '../modules/catalog/catalog.routes.js';
+
+
 const ROUTE_MODULE_KEY_PATTERN = /^[a-z][a-z0-9_-]*$/;
 
 
@@ -99,20 +102,14 @@ const mountApplicationRoutes = (
 
 /**
  * Point de composition applicatif. Le Core reste vide de routes métier.
- *
- * Exemple après dérivation :
- *
- * import { catalogRouter } from '../modules/catalog/catalog.routes.js';
- *
- * const APPLICATION_BACKEND_ROUTE_MODULES = Object.freeze([
- *     Object.freeze({
- *         key: 'catalog',
- *         mountPath: '/api/workspaces/:workspaceId/catalog',
- *         router: catalogRouter,
- *     }),
- * ]);
  */
-const APPLICATION_BACKEND_ROUTE_MODULES = Object.freeze([]);
+const APPLICATION_BACKEND_ROUTE_MODULES = Object.freeze([
+    Object.freeze({
+        key: 'catalog',
+        mountPath: '/api/workspaces/:workspaceId/catalog',
+        router: catalogRouter,
+    }),
+]);
 
 
 export {

@@ -1,5 +1,8 @@
 import { CORE_PERMISSION } from '../constants/permissions.constants.js';
 import {
+    catalogRolePermissions,
+} from '../modules/catalog/catalogRolePermissions.js';
+import {
     composeRolePermissionExtensions,
     configureRolePermissionRegistry,
     createRolePermissionRegistry,
@@ -25,7 +28,9 @@ import {
  *     },
  * }
  */
-const APPLICATION_ROLE_PERMISSION_MODULES = Object.freeze([]);
+const APPLICATION_ROLE_PERMISSION_MODULES = Object.freeze([
+    catalogRolePermissions,
+]);
 
 const applicationRolePermissionExtensions =
     composeRolePermissionExtensions(

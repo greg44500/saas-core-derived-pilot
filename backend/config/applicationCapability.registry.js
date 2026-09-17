@@ -1,4 +1,7 @@
 import {
+    catalogPlanCapabilities,
+} from '../modules/catalog/catalogPlanCapabilities.js';
+import {
     CORE_PLAN_FEATURE,
     CORE_PLAN_METRIC,
     composePlanCapabilityExtensions,
@@ -34,7 +37,9 @@ const CORE_PLAN_FEATURE_METRICS = Object.freeze({
  *     productPlanCapabilities,
  * ]);
  */
-const APPLICATION_PLAN_CAPABILITY_MODULES = Object.freeze([]);
+const APPLICATION_PLAN_CAPABILITY_MODULES = Object.freeze([
+    catalogPlanCapabilities,
+]);
 
 const ACTIVE_PLAN_CAPABILITY_REGISTRY = createPlanCapabilityRegistry(
     composePlanCapabilityExtensions(
